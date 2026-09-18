@@ -7,7 +7,7 @@
   "creators": [
     {
       "name": "Reifschneider, Jon",
-      "affiliation": "Autonomous Mission Systems Lab (AMSL), Duke University"
+      "affiliation": "Coordinated Autonomous Systems Lab (CASL), Duke University"
     }
   ],
   "keywords": [
@@ -20,7 +20,7 @@
   "related_identifiers": [
     {
       "relation": "isSupplementTo",
-      "identifier": "https://github.com/Autonomous-Mission-Systems-Lab/counter-usv-detection",
+      "identifier": "https://github.com/Coordinated-Autonomous-Systems-Lab/counter-usv-detection",
       "resource_type": "software",
       "scheme": "url"
     }

@@ -5,8 +5,8 @@ type: software
 authors:
   - family-names: Reifschneider
     given-names: Jon
-    affiliation: "Autonomous Mission Systems Lab (AMSL), Duke University"
-repository-code: "https://github.com/Autonomous-Mission-Systems-Lab/counter-usv-detection"
+    affiliation: "Coordinated Autonomous Systems Lab (CASL), Duke University"
+repository-code: "https://github.com/Coordinated-Autonomous-Systems-Lab/counter-usv-detection"
 license: MIT
 license-url: "https://opensource.org/licenses/MIT"
 abstract: >-
