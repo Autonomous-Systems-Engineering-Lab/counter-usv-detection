@@ -58,6 +58,11 @@ weights/
 # Experiment outputs
 results/**
 !results/.gitkeep
+
+# Raster/vector exports of the hand-authored figures. The SVG is the source of
+# truth; build_all.py regenerates these when cairosvg is importable.
+figures/*.pdf
+figures/*.png
 runs/
 wandb/
 mlruns/

@@ -327,24 +327,25 @@ def build_records(f: dict[str, Any]) -> list[dict[str, Any]]:
             "short_title": "Where the attack and the defense meet.",
             "caption": (
                 "A hostile uncrewed surface vessel (USV) approaches a defended asset. "
-                "A shore electro-optical (EO) camera asserts a class for it; a coastal "
+                "A shore electro-optical (EO) camera assigns a class for it; a coastal "
                 "radar tracks it in the world frame. The attacker controls appearance "
                 "only — an adversarial patch or benign hull paint — so it can reach the "
                 "EO channel but cannot invent a bearing rate on the radar channel. Both "
-                "channels meet at the dashed interface the defense reads: a claimed "
-                "class plus track features. The presence check looks "
+                "channels meet at the dashed interface the defense reads: a class "
+                "label plus track features. The presence check looks "
                 "for a radar track with no EO detection, which is what evasion "
-                "produces; the consistency check asks whether the claimed class matches "
-                "how the craft is moving, in a kinematics arm and an asset-relative "
-                "geometry arm (feature families listed in their boxes). Dashed grey, "
+                "produces; the consistency check asks whether the camera's class matches "
+                "how the craft is moving, in one version computed from the track alone "
+                "and one that also measures motion against the asset's position "
+                "(feature families listed in their boxes). Dashed grey, "
                 "bottom: the benign envelope model is fit offline on historical benign "
-                "AIS tracks. RQ1–RQ3 mark which research question each path answers."
+                "vessel tracks."
             ),
             "panels": {},
             "takeaway": (
-                "The defense never has to win in pixel space — it adjudicates the "
-                "claimed class against an independent motion channel the attacker "
-                "cannot reach."
+                "The defense never has to win a contest over pixels. It checks the "
+                "the camera's class against a separate measurement of motion that the "
+                "attacker cannot alter."
             ),
             "caveats": [
                 "Schematic, not to scale; hand-authored vector art rather than a "
@@ -424,44 +425,51 @@ def build_records(f: dict[str, Any]) -> list[dict[str, Any]]:
             ),
             "caption": (
                 "Defense detection rate (DDR) — the fraction of successful disguises "
-                "the defense flags — by mimicked benign class, under the "
-                "perfect-disguise oracle. (a) A mimicking approach: presence check "
-                "versus both consistency arms. The presence check is 0% for all three "
-                "classes and is drawn as a short stub so the zero stays visible. "
-                "(b) The unconstrained end-member, in which the adversary pays no "
-                "added approach time; only the two consistency arms are plotted. "
-                "Recreational is the only class "
-                f"either arm misses — {f['ddr_rec_kin']:.0f}% kinematics and "
-                f"{f['ddr_rec_geo']:.0f}% with geometry added while mimicking, "
-                f"{f['unc_rec_kin']:.0f}% and {f['unc_rec_geo']:.0f}% unconstrained — "
-                "while fishing and sailing are at 100% throughout. Both panels are at "
-                "the calibrated false-alarm rate (FAR) "
+                "the defense flags — by the benign class the hostile craft is "
+                "imitating. The disguise is assumed to have already worked: the "
+                "defense is simply told the camera assigned that class, with no "
+                "adversarial patch involved. (a) An approach that imitates that "
+                "class, comparing a presence check — which looks for a radar track "
+                "that has no matching camera detection — against the two versions of "
+                "the motion check. The presence check is 0% for all three classes and "
+                "is drawn as a short stub so the zero stays visible. (b) An approach "
+                "that does not imitate anything, running in at burst speed for no added "
+                "approach time; only the two motion checks are plotted. Recreational is "
+                "the only class either version misses — "
+                f"{f['ddr_rec_kin']:.0f}% from the track alone and "
+                f"{f['ddr_rec_geo']:.0f}% once motion is also measured against the "
+                "asset's position while imitating, "
+                f"{f['unc_rec_kin']:.0f}% and {f['unc_rec_geo']:.0f}% when it does not "
+                "imitate at all — while fishing and sailing are at 100% throughout. "
+                "Both panels are at the calibrated false-alarm rate (FAR) "
                 f"@{f['oracle_target']:.0f}% operating point; "
-                f"n = {f['oracle_n_cell']:,} scored trips per class × arm."
+                f"n = {f['oracle_n_cell']:,} scored trips per class and version."
             ),
             "panels": {
                 "a": (
-                    "Perfect-disguise oracle DDR by mimicked class, comparing the "
-                    "presence check against both consistency arms."
+                    "Detection rate by the class being imitated, comparing the presence "
+                    "check against both versions of the motion check."
                 ),
                 "b": (
-                    "The unconstrained (no added approach time) end-member, where the "
-                    "recreational gap between the two arms is widest; the presence "
-                    "check is not plotted."
+                    "An approach with no imitation at all, and so no added approach "
+                    "time, where the recreational gap between the two versions is "
+                    "widest; the presence check is not plotted."
                 ),
             },
             "takeaway": (
-                "A presence check is blind exactly where disguise succeeds — it looks "
-                "for a missing detection, and a successful disguise supplies one — and "
-                "the geometry arm is what closes that gap for recreational, the "
-                "kinematically closest benign class."
+                "A presence check is blind exactly where disguise succeeds, because it "
+                "looks for a missing camera detection and a successful disguise "
+                "supplies one. Measuring motion against the asset's position is what "
+                "detects the recreational case, the benign class whose ordinary motion "
+                "is closest to an attack run."
             ),
             "caveats": [
-                "Oracle-conditioned: the adversary is handed the benign assertion, so "
-                "this is a defense measurement, not an end-to-end attack success rate.",
-                f"Realized test FAR is {f['oracle_far_kin']:.1f}% for kinematics only "
-                f"and {f['oracle_far_geo']:.1f}% for kinematics + geometry, so the "
-                f"geometry arm's extra DDR is bought at a realized FAR above the "
+                "The disguise is assumed to have succeeded — the defense is handed the "
+                "benign class assertion — so this measures the defense, not an "
+                "end-to-end attack success rate.",
+                f"Realized test FAR is {f['oracle_far_kin']:.1f}% from the track alone "
+                f"and {f['oracle_far_geo']:.1f}% once the asset's position is used, so "
+                f"the extra detection comes at a realized false-alarm rate above the "
                 f"{f['oracle_target']:.0f}% target.",
                 f"Negative control (benign craft under a truthful assertion) returns 0% "
                 f"DDR on n = {f['negctl_n']} for both arms.",
@@ -496,7 +504,7 @@ def build_records(f: dict[str, Any]) -> list[dict[str, Any]]:
             ),
             "caption": (
                 "Fraction of real AIS windows the kinematics-arm consistency check "
-                "flags when a window's true class (row) is relabelled with an asserted "
+                "flags when a window's true class (row) is scored under a different "
                 f"class (column), at the frozen calibrated FAR@{f['swap_target']:.0f}% "
                 f"operating point over {f['swap_trips']} banded trips. The rightmost "
                 "column, past the rule, is the matched control — the same windows scored "
@@ -551,75 +559,88 @@ def build_records(f: dict[str, Any]) -> list[dict[str, Any]]:
                 "results/paper/fig5_rq3_cost_warning.png",
             ],
             "short_title": (
-                "A kinematics-only check is weakest against the cheapest attack; "
-                "asset-relative geometry closes that route and warns earlier."
+                "Measured from the track alone, the check is weakest against the "
+                "cheapest attack; measuring against the asset's position detects it, "
+                "and sooner."
             ),
             "caption": (
-                "(a) End-of-track DDR against commit range — the range, in nautical "
-                "miles (nm), at which the adversary breaks off its benign-looking "
-                "mimicry, turns radially inbound and accelerates to burst speed for the "
-                "terminal run. The arrow under the axis marks that commit range runs "
-                "opposite to cost. Open markers past the dotted rule are the "
-                "unconstrained end-member (no mimicry, zero added time). Fishing and "
-                "sailing hold 100% for both arms throughout, drawn as one grey series. "
-                "Recreational is the exception: kinematics-only DDR is "
-                f"{rec_kin.get(0.5, (0,))[0]:.0f}% at a 0.5 nm commit, "
+                "(a) Detection rate at the end of the track, against commit range — the "
+                "distance from the defended asset, in nautical miles (nm), at which the "
+                "attacker stops imitating a benign vessel, turns straight inbound and "
+                "accelerates to burst speed for the final run. A smaller commit range "
+                "therefore means the attacker kept up the imitation for longer and gave "
+                "up more time doing so, which is why the arrow under the axis marks "
+                "that the axis runs opposite to the attacker's cost. Open markers past "
+                "the dotted rule are an attacker that does not imitate anything and so "
+                "gives up no time at all. Fishing and sailing hold 100% for both "
+                "versions of the check throughout, drawn as one grey series. "
+                "Recreational is the exception: computed from the track alone, "
+                "detection is "
+                f"{rec_kin.get(0.5, (0,))[0]:.0f}% at a 0.5 nm commit range, "
                 f"{rec_kin.get(4.0, (0,))[0]:.0f}% at 4 nm and "
-                f"{rec_kin.get(cmax, (0,))[0]:.0f}% unconstrained, while the geometry "
-                f"arm holds {rec_geo.get(cmax, (0,))[0]:.0f}% across the sweep and at "
-                "the end-member, dipping only at the shortest 0.5 nm commit "
-                f"({rec_geo.get(0.5, (0,))[0]:.0f}%). (b) Median range at first flag, "
-                "annotated with median first-flag time in minutes relative to annulus "
-                "entry, so smaller and negative values are earlier warnings. The "
-                "geometry arm flags recreational "
+                f"{rec_kin.get(cmax, (0,))[0]:.0f}% with no imitation, while measuring "
+                "motion against the asset's position holds "
+                f"{rec_geo.get(cmax, (0,))[0]:.0f}% across the sweep and for the "
+                "unimitated run, falling only at the shortest 0.5 nm commit range "
+                f"({rec_geo.get(0.5, (0,))[0]:.0f}%), where breaking off that close "
+                "leaves almost no approach to measure. (b) Median range at the first "
+                "alarm, annotated with the median time of that alarm in minutes "
+                "measured from the moment the craft comes within 6 nm of the asset, so "
+                "smaller and negative values are earlier warnings. Using the asset's "
+                "position raises the alarm on recreational "
                 f"{wr('recreational', 'kinematics_geometry', 'R_flag_nm_median'):.1f} nm "
                 f"out against "
-                f"{wr('recreational', 'kinematics_only', 'R_flag_nm_median'):.1f} nm for "
-                f"kinematics only ({wt('recreational', 'kinematics_geometry'):g} vs "
-                f"{wt('recreational', 'kinematics_only'):g} min), and fishing similarly; "
-                "sailing is the exception, where the kinematics arm flags before annulus "
-                f"entry ({wt('sailing', 'kinematics_only'):g} min at "
+                f"{wr('recreational', 'kinematics_only', 'R_flag_nm_median'):.1f} nm "
+                f"from the track alone ({wt('recreational', 'kinematics_geometry'):g} vs "
+                f"{wt('recreational', 'kinematics_only'):g} min), and fishing similarly. "
+                "Sailing is the exception: from the track alone the alarm is usually "
+                "raised before the craft is within 6 nm at all "
+                f"({wt('sailing', 'kinematics_only'):g} min at "
                 f"{wr('sailing', 'kinematics_only', 'R_flag_nm_median'):.1f} nm). "
-                f"n = {f['warn_n']:,} trips per class × arm in panel (b)."
+                f"n = {f['warn_n']:,} trips per class and version in panel (b)."
             ),
             "panels": {
                 "a": (
-                    "End-of-track DDR versus the range at which the adversary breaks "
-                    "off mimicry and runs in; fishing and sailing are flat at 100% for "
-                    "both arms and are drawn as a single grey series. Colour keys the "
-                    "defense arm in both panels. The geometry arm's dip at the shortest "
-                    "commit is a short-geometry effect: little approach geometry remains "
-                    "to judge."
+                    "Detection rate at the end of the track against the distance at "
+                    "which the attacker stops imitating and runs in; fishing and sailing "
+                    "are flat at 100% for both versions of the check and are drawn as a "
+                    "single grey series. Colour keys which version is plotted, in both "
+                    "panels. The dip at the shortest commit range occurs because "
+                    "breaking off that close leaves almost no approach to measure."
                 ),
                 "b": (
-                    "Median first-flag standoff by class and arm, annotated with median "
-                    "first-flag time relative to annulus entry."
+                    "Median range at the first alarm, by class and by version of the "
+                    "check, annotated with the median time of that alarm measured from "
+                    "the moment the craft comes within 6 nm."
                 ),
             },
             "takeaway": (
-                "Elaborate mimicry does not buy the adversary anything against a "
-                "kinematics-only check — the cheap direct run is the one it misses, "
-                "because a burst transition out of a slow benign track is itself "
-                "anomalous while a fast straight run-in merely resembles a recreational "
-                "speedboat to features that know nothing about the defended asset. "
-                "Asset-relative geometry closes that route and warns roughly ten "
-                "minutes earlier."
+                "Careful imitation gains the attacker nothing against a check computed "
+                "from the track alone: the attack it misses is the cheap direct run. "
+                "Accelerating out of a slow benign-looking track is itself abnormal, "
+                "whereas a fast straight run-in merely resembles a recreational "
+                "speedboat to a check that does not know where the asset is. Measuring "
+                "motion against the asset's position detects that run and raises the "
+                "alarm roughly ten minutes sooner."
             ),
             "caveats": [
-                f"The rightmost point ({cmax:g} nm) is the unconstrained end-member "
-                f"(burst speed, radial, no mimicry, zero added approach time), not a "
-                f"longer-commit sweep cell: the curve changes experimental condition "
-                f"there. It is also the thinnest point, at n = {f['commit_max_n']} per "
-                f"arm against n = 480 per arm for the 0.5–4 nm sweep cells.",
-                "Commit range runs opposite to cost — added approach time falls as "
-                "commit range grows — so the panel should not be read as a "
-                "monotone cost axis. The primary added-approach-time pivot and the "
-                "speed and bearing-offset companions live in "
-                "results/adaptive_cost/adaptive_cost_report.md.",
-                "Swept under the perfect-disguise oracle, so panel (a) is a defense "
-                "measurement conditioned on the disguise already succeeding.",
-                "First-flag time is measured from annulus entry, so it can be negative; "
-                "it is not directly comparable to end-of-track DDR in panel (a).",
+                f"The rightmost point ({cmax:g} nm) is a different condition, not another "
+                f"step along the sweep: the attacker imitates nothing, runs straight in "
+                f"at burst speed and gives up no approach time. It is also the thinnest "
+                f"point, at n = {f['commit_max_n']} per version of the check against "
+                f"n = 480 for the 0.5–4 nm cells.",
+                "The axis runs opposite to what the attack costs the attacker, because "
+                "the time given up falls as the commit range grows, so the panel should "
+                "not be read as a cost axis increasing left to right. The added "
+                "approach time itself, and the companion sweeps over speed and approach "
+                "bearing, are in results/adaptive_cost/adaptive_cost_report.md.",
+                "The disguise is assumed to have already succeeded — the defense is told "
+                "the class the camera assigned — so panel (a) measures the defense rather than an "
+                "end-to-end attack success rate.",
+                "The time of the first alarm is measured from the moment the craft comes "
+                "within 6 nm, so it can be negative; "
+                "it is not directly comparable to the end-of-track detection rate in "
+                "panel (a), which answers a different question.",
             ],
             "sources": [
                 "results/adaptive_cost/adaptive_cost_curves.parquet (axis=commit_range_nm)",
@@ -791,28 +812,29 @@ def build_records(f: dict[str, Any]) -> list[dict[str, Any]]:
                 "results/paper/figS2_pooled_gap.png",
             ],
             "short_title": (
-                "Class conditioning buys discriminability, not just false-alarm "
-                "calibration."
+                "Using the camera's class makes the check better at telling a true "
+                "assignment from a false one, not merely looser about false alarms."
             ),
             "caption": (
                 "Class-conditional versus pooled benign envelopes at matched FAR@5%. "
                 "(a) Real-track label-swap gap — swapped flag rate minus the matched "
                 "control, in percentage points (pp) — for the three headline cells, "
-                "whose ticks read source class \"as\" asserted class. Under one shared "
+                "whose ticks read source class \"as\" the class being tested. Under one shared "
                 f"`{f['pool_override']}` envelope the recreational gaps collapse "
                 f"({f['gap_rec_fish']:+.1f} to {f['gap_rec_fish_pooled']:+.1f} pp as "
                 f"fishing, {f['gap_rec_sail']:+.1f} to "
                 f"{f['gap_rec_sail_pooled']:+.1f} as sailing) and the passenger-ferry "
                 f"gap shrinks ({f['gap_ferry_fish']:+.1f} to "
-                f"{f['gap_ferry_fish_pooled']:+.1f}). (b) Perfect-disguise oracle DDR "
-                "for the mimicking condition, class-conditional (solid) versus pooled "
-                "(hatched), both arms. Pooling collapses the per-class spread onto a "
-                f"single value per arm — kinematics from {f['ddr_fish_kin']:.0f}% "
-                f"(fishing and sailing) and {f['ddr_rec_kin']:.0f}% (recreational) to a "
-                f"shared {f['ddr_fish_kin_pooled']:.0f}%, geometry from "
-                f"{f['ddr_rec_geo']:.0f}–{f['ddr_fish_geo']:.0f}% to a shared "
-                f"{f['ddr_fish_geo_pooled']:.0f}% — which is what one envelope for all "
-                "asserted classes must produce."
+                f"{f['gap_ferry_fish_pooled']:+.1f}). (b) Detection rate against an "
+                "imitating approach, one model per class (solid) versus one shared model "
+                "(hatched), for both versions of the check. Pooling collapses the "
+                "per-class spread onto a single value per version — from the track "
+                f"alone, {f['ddr_fish_kin']:.0f}% (fishing and sailing) and "
+                f"{f['ddr_rec_kin']:.0f}% (recreational) become a shared "
+                f"{f['ddr_fish_kin_pooled']:.0f}%; with the asset's position, "
+                f"{f['ddr_rec_geo']:.0f}–{f['ddr_fish_geo']:.0f}% becomes a shared "
+                f"{f['ddr_fish_geo_pooled']:.0f}% — which is what a single model for "
+                "every class the camera can assign has to produce."
             ),
             "panels": {
                 "a": (
@@ -820,29 +842,31 @@ def build_records(f: dict[str, Any]) -> list[dict[str, Any]]:
                     "headline cells)."
                 ),
                 "b": (
-                    "Oracle DDR under the mimicking condition, conditional vs pooled, "
-                    "for fishing / recreational / sailing (both arms)."
+                    "Detection rate against an imitating approach, one model per class "
+                    "versus one shared model, for fishing, recreational and sailing, in "
+                    "both versions of the check."
                 ),
             },
             "takeaway": (
-                "Pooling matches or beats on false alarms but loses discriminability; "
-                "class-conditional envelopes are what carry the disguise check."
+                "A single shared model matches or beats the per-class models on false "
+                "alarms, but loses the ability to tell a true class assignment from a false "
+                "one. The per-class models are what make the disguise check work."
             ),
             "caveats": [
-                "Pooled routing yields one flag rate per source for every asserted "
-                "class, so a residual non-zero gap can only come from different "
+                "Pooled routing yields one flag rate per source for every class the "
+                "camera can assign, so a residual non-zero gap can only come from different "
                 "samples in swap vs matched (the ferry cohort), not from class "
                 "mismatch.",
-                "The unconstrained end-member is not plotted here: under pooled "
-                f"kinematics fishing and sailing fall to "
+                "The approach with no imitation at all is not plotted here: with a single "
+                f"shared model computed from the track alone, fishing and sailing fall to "
                 f"{f['unc_fish_kin_pooled']:.0f}% and "
-                f"{f['unc_sail_kin_pooled']:.0f}%, matching recreational, while the "
-                "geometry arm still closes it under either routing.",
-                "Panel (b) is the frozen 5,880-cell oracle grid. Supplementary to "
-                "Fig. 4 (label-swap) and Fig. 3 (oracle DDR); thresholds never "
+                f"{f['unc_sail_kin_pooled']:.0f}%, matching recreational, while using the "
+                "asset's position still detects it either way.",
+                "Panel (b) is the frozen 5,880-cell grid. Supplementary to Fig. 4 "
+                "(label swap) and Fig. 3 (detection rate); thresholds were never "
                 "retuned.",
-                "Envelope joblib weights are not redistributed; digests are pinned "
-                "in the kinematics arm freeze.",
+                "Model weight files are not redistributed; their digests are pinned in "
+                "the freeze for the track-only check.",
             ],
             "sources": [
                 "results/label_swap/label_swap_summary.json",

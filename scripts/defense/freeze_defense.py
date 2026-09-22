@@ -590,11 +590,15 @@ def main() -> int:
         assert entry is not None
         configs[Path(rel).name] = entry
 
+    # Key by relative path, not basename: the pooled and non-pooled evaluations
+    # share filenames, so keying by name let the pooled ablation silently
+    # overwrite the headline artifacts and drop them from the freeze.
     results: dict[str, Any] = {}
     for rel in EVAL_ARTIFACTS:
         entry = _digest_entry(rel, required=True)
         assert entry is not None
-        results[Path(rel).name] = entry
+        assert rel not in results, f"duplicate freeze key {rel}"
+        results[rel] = entry
 
     version = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     payload: dict[str, Any] = {

@@ -38,7 +38,7 @@ def test_verify_freezes_catches_tamper(tmp_path: Path) -> None:
     import _common as common
 
     freeze = json.loads((REPO_ROOT / "results" / "defense" / "FROZEN.json").read_text())
-    entry = freeze["evaluation"]["artifacts"]["label_swap_summary.json"]
+    entry = freeze["evaluation"]["artifacts"]["results/label_swap/label_swap_summary.json"]
     rel = entry["path"]
     src = REPO_ROOT / rel
     assert src.is_file(), "label_swap summary must exist for this test"

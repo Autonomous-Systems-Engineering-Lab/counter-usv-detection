@@ -12,13 +12,14 @@ The attack/defense interface for shore-based counter-USV detection.
 Two sensing channels run left to right. The optical channel (camera to detector to asserted class)
 is the one an attacker can reach, by adversarial patch or by simply looking like a benign vessel.
 The radar channel supplies world-frame range and bearing, which a patch cannot alter. Both meet the
-defense at a deliberately narrow interface — the claimed class plus track features — rather than
+defense at a deliberately narrow interface — the class label plus track features — rather than
 through joint optimization over pixels and motion.
 
 On the defense side, the presence check catches evasion by finding a radar track with no EO
-detection; it reads detection status only and never the claimed class. The consistency check catches
-disguise by asking whether the claimed class matches how the craft is actually moving, and reports
-its two arms separately: kinematics, and geometry relative to a defended asset.
+detection; it reads detection status only and never the class label. The consistency check catches
+disguise by asking whether the camera's class matches how the craft is actually moving, and reports
+its two arms separately: the track-only check, and the asset-relative check that measures the same
+motion against the position of the defended asset.
 
 The dashed path entering from below is offline model fitting. Real benign AIS tracks produce one
 envelope per benign class. AIS is never read at runtime and no hostile tracks enter the model, which
